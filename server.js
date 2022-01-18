@@ -1,4 +1,5 @@
-const app = require('express')()
+const express = require('express')
+const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server, {
     cors: {
@@ -6,9 +7,11 @@ const io = require('socket.io')(server, {
         methods: ["GET", "POST"],
         credentials: true
     }
-  })
+})
 
 const { PORT = 9999 } = process.env
+
+app.use(express.json())
 
 const chatData = new Map([
 
@@ -20,6 +23,7 @@ app.get('/rooms', (req, res) => {
 })
 
 app.post('/rooms', (req, res) => {
+    console.log(req.body)
     res.status(201).send({ status: 'created!' })
 })
 
