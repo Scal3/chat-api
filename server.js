@@ -10,13 +10,17 @@ const io = require('socket.io')(server, {
 
 const { PORT = 9999 } = process.env
 
-const rooms = new Map([
+const chatData = new Map([
 
 ])
 
 
 app.get('/rooms', (req, res) => {
-    res.json('sasi')
+    res.status(200).send({ chatData })
+})
+
+app.post('/rooms', (req, res) => {
+    res.status(201).send({ status: 'created!' })
 })
 
 io.on('connection', socket => {
