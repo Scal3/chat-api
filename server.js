@@ -13,9 +13,7 @@ const { PORT = 9999 } = process.env
 
 app.use(express.json())
 
-const chatData = new Map([
-
-])
+const chatData = new Map()
 
 
 app.get('/rooms', (req, res) => {
@@ -23,11 +21,26 @@ app.get('/rooms', (req, res) => {
 })
 
 app.post('/rooms', (req, res) => {
-    console.log(req.body)
-    res.status(201).send({ status: 'created!' })
+    const { room, userName } = req.body
+    if(!chatData.has(room)) {
+        chatData.set(
+            room, 
+            new Map([
+            ['users', new Map()],
+            ['messages', []]
+        ]))
+    }
+    res.status(201).send([...chatData.values()])
 })
 
 io.on('connection', socket => {
+    socket.on('ROOM:JOIN', ({ room, userName }) => {
+        socket.join(room)
+        chatData.get(room).get('users').socket(socket.id, userName)
+        const users = chatData.get(room).get('users').values()
+        socket.to(room).broadcast.emit('ROOM:JOINED', users)
+    })
+
     console.log('user connected', socket.id)
 })
 
