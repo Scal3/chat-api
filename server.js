@@ -38,8 +38,7 @@ io.on('connection', socket => {
         socket.join(room)
         chatData.get(room).get('users').set(socket.id, userName)
         const users = [...chatData.get(room).get('users').values()]
-        // socket.to(room).broadcast.emit('ROOM:JOINED', users)
-        socket.to(room).emit('ROOM:JOINED', users)
+        socket.broadcast.to(room).emit('ROOM:JOINED', users)
     })
 
     console.log('user connected', socket.id)
