@@ -41,6 +41,17 @@ io.on('connection', socket => {
         socket.broadcast.to(room).emit('ROOM:JOINED', users)
     })
 
+    socket.on('disconnect', () => {
+        chatData.forEach((value, room) => {
+            if(value.get('users').delete(socket.id)) {
+                const users = [...value.get('users').values()]
+                socket.broadcast.to(room).emit('ROOM:SET_USERS', users)
+            } else {
+                console.log('err') // !!
+            }
+        })
+    })
+
     console.log('user connected', socket.id)
 })
 
