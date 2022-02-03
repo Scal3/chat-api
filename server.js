@@ -16,8 +16,13 @@ app.use(express.json())
 const chatData = new Map()
 
 
-app.get('/rooms', (req, res) => {
-    res.status(200).send({ chatData })
+app.get('/rooms/:id', (req, res) => {
+    const room = req.params.id
+    const roomData = {
+        users: [...chatData.get(room).get('users').values()],
+        messages: [...chatData.get(room).get('messages').values()]
+    }
+    res.status(200).send({ roomData })
 })
 
 app.post('/rooms', (req, res) => {
@@ -36,9 +41,27 @@ app.post('/rooms', (req, res) => {
 io.on('connection', socket => {
     socket.on('ROOM:JOIN', ({ room, userName }) => {
         socket.join(room)
-        chatData.get(room).get('users').socket(socket.id, userName)
-        const users = chatData.get(room).get('users').values()
-        socket.to(room).broadcast.emit('ROOM:JOINED', users)
+        chatData.get(room).get('users').set(socket.id, userName)
+        const users = [...chatData.get(room).get('users').values()]
+        socket.to(room).emit('ROOM:SET_USERS', users)
+    })
+
+    socket.on('ROOM:NEW_MESSAGE', ({ room, userName, text }) => {
+        const messageObject = { userName, text }
+        console.log(messageObject)
+        chatData.get(room).get('messages').push(messageObject)
+        socket.broadcast.to(room).emit('ROOM:NEW_MESSAGE', messageObject)
+    })
+
+    socket.on('disconnect', () => {
+        chatData.forEach((value, room) => {
+            if(value.get('users').delete(socket.id)) {
+                const users = [...value.get('users').values()]
+                socket.broadcast.to(room).emit('ROOM:SET_USERS', users)
+            } else {
+                console.log('err') // !!
+            }
+        })
     })
 
     console.log('user connected', socket.id)
