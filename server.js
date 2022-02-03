@@ -16,8 +16,13 @@ app.use(express.json())
 const chatData = new Map()
 
 
-app.get('/rooms', (req, res) => {
-    res.status(200).send({ chatData })
+app.get('/rooms/:id', (req, res) => {
+    const room = req.params.id
+    const roomData = {
+        users: [...chatData.get(room).get('users').values()],
+        messages: [...chatData.get(room).get('messages').values()]
+    }
+    res.status(200).send({ roomData })
 })
 
 app.post('/rooms', (req, res) => {
