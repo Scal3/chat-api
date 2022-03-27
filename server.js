@@ -46,8 +46,8 @@ io.on('connection', socket => {
         socket.to(room).emit('ROOM:SET_USERS', users)
     })
 
-    socket.on('ROOM:NEW_MESSAGE', ({ room, userName, text }) => {
-        const messageObject = { userName, text }
+    socket.on('ROOM:NEW_MESSAGE', ({ room, userName, text, currentDate }) => {
+        const messageObject = { userName, text, currentDate }
         console.log(messageObject)
         chatData.get(room).get('messages').push(messageObject)
         socket.broadcast.to(room).emit('ROOM:NEW_MESSAGE', messageObject)
