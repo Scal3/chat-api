@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Scal3/chat-api#readme",
   "dependencies": {
+    "dotenv": "^16.0.1",
     "express": "^4.17.2",
     "socket.io": "^4.4.1"
   },

@@ -1,13 +1,9 @@
 const express = require('express')
+const socketSettings = require('./utils/socketSettings')
 const app = express()
 const server = require('http').Server(app)
-const io = require('socket.io')(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-        credentials: true
-    }
-})
+const io = require('socket.io')(server, socketSettings)
+
 const chatData = require('./chatData/chatData');
 const indexRouter = require('./routers/index');
 
